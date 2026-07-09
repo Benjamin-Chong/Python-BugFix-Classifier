@@ -7,7 +7,6 @@ ds = load_dataset("iberu/RunBugRun")
 print(ds.keys())
 print(ds['train'].column_names)
 print(ds['train'][0])
-
 #investigating: distribution of labels for top 20 and the number of unique labels
 label_counter = Counter()
 
@@ -77,3 +76,14 @@ for row in ds['train']:
 
 for key, value in unique_amount_label_counter.most_common(5):
     print(f'Unique Identifier Amount: {key} - Frequency: {value}')
+    
+#investigating: rows with no labels
+rows_with_empty_label = []
+for row in ds['train']:
+    if row['labels'] == None:
+        rows_with_empty_label.append((row['buggy_code'], row['fixed_code']))
+
+print(f'This is the number of rows in the rows without any labels: {len(rows_with_empty_label)}')
+
+for i in range(5): #the range can be changed as long as it is less than the len of the list
+    print(f'Buggy Code {i}:\n {rows_with_empty_label[i][0]}\n Fixed Code {i}:\n {rows_with_empty_label[i][1]}')
