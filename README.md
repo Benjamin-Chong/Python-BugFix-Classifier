@@ -71,3 +71,15 @@ The first version of this project will use:
 - FastAPI
 - Pytest
 - Docker
+
+## Dataset Decisions
+
+## Single-lable Filtering
+
+The original RunBugRun dataset from Hugging Face. For the V1 baseline, I used the training split to generate diffs from buggy_code and fixed_code.
+
+The original dataset had 133,705 examples. However, after filtering only to single labels, 35,962 labels were leftover. After examining the distribution of labels, I found that there were some examples with only a handful of examples (< 200) and decided to remove them.
+
+The classes removed may be revisited in a future version.
+
+I considered combining the rare clasess into one, but I decided to filter through these examples as they do not have a coherent bucket other than being "rare." Essentially, these are only grouped by frequency rather than semantic meaning.
