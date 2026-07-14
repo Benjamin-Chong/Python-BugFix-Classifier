@@ -9,9 +9,6 @@ The goal of this project is to train and evaluate a supervised machine learning 
 The final system will take buggy and fixed Python code as input and return:
 
 - predicted bug pattern
-- confidence score
-- top-k alternative predictions
-- short explanation of the predicted bug type
 
 ## Dataset
 
@@ -22,36 +19,34 @@ Target Examples Include:
 - buggy Python code
 - fixed Python code
 - bug pattern label
-- optional test/result metadata
 
-## Architecture
+## Architecture V1
 
 1. Data Loading:
 - Load raw dataset files
-- Filter examples to only Python code
+- Filter examples to only Python code (already done by RunBugRun)
 
 2. Preprocessing:
 - Extract buggy code, fixed code, and labels.
 - Remove incomplete examples.
 - Normalize labels.
-- Create train/validation/test splits
+- Create train/validation/test splits.
 
 3. Feature Engineering:
 - Convert code into numerical features using TF-IDF.
 - Experiment with buggy code, fixed code, and code diff representations.
 
 4. Model Training:
-- Train baseline classifiers such as Logistic Regression and Linear SVM.
-- Handle label imbalance when needed.
+- Train baseline classifiers: Logistic Regression and Linear SVM.
 
 5. Evaluation:
 - Evaluate with accuracy, macro F1, weighted F1, top-k accuracy, and confusion matrix.
 - Analyze which bug labels are commonly confused.
 
-6.  Inference API:
+6.  Inference API (V2/3):
 - Save the trained model and vectorizer.
 - Load them in a FastAPI application.
-- Return predicted bug type, confidence score, and top-k predictions.
+- Return the predicted bug type, confidence score, and top-k predictions.
 
 ## MVP
 
@@ -59,7 +54,6 @@ The first version of this project will use:
 - TF-IDF feature extraction
 - Logistic Regression classifier
 - bug pattern classification
-- FastAPI inference endpoint
 
 ## Planned Tech Stack
 - Python
@@ -68,18 +62,38 @@ The first version of this project will use:
 - TF-IDF
 - Logistic Regression
 - Linear SVM
-- FastAPI
 - Pytest
-- Docker
 
 ## Dataset Decisions
 
-## Single-lable Filtering
+## Single-label Filtering
 
-The original RunBugRun dataset from Hugging Face. For the V1 baseline, I used the training split to generate diffs from buggy_code and fixed_code.
+The original RunBugRun dataset comes from Hugging Face. For the V1 baseline, I used the training split to generate diffs from buggy_code and fixed_code.
 
-The original dataset had 133,705 examples. However, after filtering only to single labels, 35,962 labels were leftover. After examining the distribution of labels, I found that there were some examples with only a handful of examples (< 200) and decided to remove them.
+The original dataset had 133,705 examples. However, after filtering only to single labels, 35,962 labels remained. After examining the distribution of labels, I found that there were some classes with only a handful of examples (< 200) and decided to remove them.
 
 The classes removed may be revisited in a future version.
 
-I considered combining the rare clasess into one, but I decided to filter through these examples as they do not have a coherent bucket other than being "rare." Essentially, these are only grouped by frequency rather than semantic meaning.
+I considered combining the rare classes into one, but I decided to filter through these examples as they do not have a coherent bucket other than being "rare." Essentially, these are only grouped by frequency rather than semantic meaning.
+
+## V1 Metrics
+
+### Baseline Comparison
+
+Logistic Regression slightly outperformed the Linear SVM. There was confusion between the Assignment class and the call class. The expression class was the worst class and was confused with call. This suggests that the choice of classifier may not the primary reason for these errors. I will continue with V2 to figure out if TF-IDF is the limiting factor and I will also continue error analysis to figure out why.
+
+### Notable Logistic Regression Findings
+- Overall Accuracy: 70.81%
+- Assignment: 75.14% recall, some confusion with the call class
+- Call: 89.08% recall
+- Control-Flow: 86.28% recall
+- Expression: 21.44% recall, worst class and the model predicted call rather than expression
+- Identifier: 23.66% recall, model also predicted call rather than identifier
+
+### Notable Linear SVC Findings
+- Overall Accuracy: 69.97%
+- Assignment: 65.32% recall, some confusion with the call class (lower than Logical Regression)
+- Call: 89.63% recall, slightly better than Logistic Regression
+- Control-Flow: 87.49% recall, slightly better than Logistic Regression
+- Expression: 21.17% recall, worst class and the model predicted call rather than expression (lower than Logistic Regression)
+- Identifier: 24.53% recall, model also predicted call rather than identifier (higher than Logistic Regression)

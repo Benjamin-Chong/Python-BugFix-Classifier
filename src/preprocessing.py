@@ -9,4 +9,3 @@ def generate_diff(buggy_code, fixed_code): #goal is to create the difference bet
     diff = [line for line in diff if line.startswith('+') or line.startswith('-')]
     diff = '\n'.join(diff)
     return diff
-
