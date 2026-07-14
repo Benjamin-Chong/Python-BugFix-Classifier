@@ -70,7 +70,7 @@ The first version of this project will use:
 
 The original RunBugRun dataset comes from Hugging Face. For the V1 baseline, I used the training split to generate diffs from buggy_code and fixed_code.
 
-The original dataset had 133,705 examples. However, after filtering only to single labels, 35,962 labels remained. After examining the distribution of labels, I found that there were some classes with only a handful of examples (< 200) and decided to remove them.
+The original dataset had 133,705 examples. However, after filtering only to single labels, 35,926 labels remained. After examining the distribution of labels, I found that there were some classes with only a handful of examples (< 200) and decided to remove them. This left me with 35,641 examples for the V1 baseline.
 
 The classes removed may be revisited in a future version.
 
@@ -92,7 +92,7 @@ Logistic Regression slightly outperformed the Linear SVM. There was confusion be
 
 ### Notable Linear SVC Findings
 - Overall Accuracy: 69.97%
-- Assignment: 65.32% recall, some confusion with the call class (lower than Logical Regression)
+- Assignment: 65.32% recall, some confusion with the call class (lower than Logistic Regression)
 - Call: 89.63% recall, slightly better than Logistic Regression
 - Control-Flow: 87.49% recall, slightly better than Logistic Regression
 - Expression: 21.17% recall, worst class and the model predicted call rather than expression (lower than Logistic Regression)
