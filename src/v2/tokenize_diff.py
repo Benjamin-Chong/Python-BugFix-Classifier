@@ -19,7 +19,6 @@ def tokenize_diff(changes):
         if holder:
             tokens.append(holder)
         try:
-            line = line.strip()
             token_generator = tokenize.generate_tokens(io.StringIO(line).readline)
             for token in token_generator:
                 if token.type == tokenize.ENDMARKER or token.type == tokenize.NEWLINE or token.type == tokenize.NL:
