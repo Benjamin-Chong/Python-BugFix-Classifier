@@ -130,7 +130,7 @@ This suggests that the choice of classifier may not be the primary reason for th
 
 ## Deeper Error Analysis
 
-After completing the error analysis (more detailed evidence can be found in [`04_error_analysis.ipynb`](notebooks/04_error_analysis.ipynb)), I found several limitations of the TF-IDF classifier.
+After completing the error analysis (more detailed evidence can be found in [`04_error_analysis.ipynb`](notebooks/notebooks_v1/04_error_analysis.ipynb)), I found several limitations of the TF-IDF classifier.
 
 For example, the classifier performed well on labels that were strongly associated with common Python keywords. The `control_flow` class performed well because it contained tokens such as `if`, `elif`, `break`, `or`, and `while`, which were clear indicators of the class.
 

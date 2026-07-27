@@ -43,9 +43,3 @@ def tokenize_diff(changes):
         tokens += line_tokens
 
     return tokens
-
-multiline_diff = """+ result = foo(
-+     a,
-+ )"""
-
-print(tokenize_diff(multiline_diff))
