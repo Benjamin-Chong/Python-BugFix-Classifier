@@ -8,3 +8,4 @@ uvicorn
 joblib
 python-dotenv
 datasets
+pyarrow

@@ -3,9 +3,9 @@ import io
 #Note: Indentation was normalized into four space levels. Each partial level is rounded down
 
 def indentation_level(line):
-    tabs = line.count('\t')
-    level = (len(line) - len(line.lstrip(' '))) // 4
-    return f'<INDENT_{tabs + level}>'
+    expanded_tabs = line.expandtabs(tabsize=4)
+    level = (len(expanded_tabs) - len(expanded_tabs.lstrip(' '))) // 4
+    return f'<INDENT_{level}>'
 
 
 def tokenize_diff(changes):
@@ -26,7 +26,6 @@ def tokenize_diff(changes):
         elif line[0] == '+':
             holder = '<ADD>'
             line = line[2:]
-        print(line)
         indentation = indentation_level(line)
         line = line.strip() #strip after getting the indent level
         
@@ -36,11 +35,17 @@ def tokenize_diff(changes):
                 if token.type in (tokenize.ENDMARKER, tokenize.NEWLINE, tokenize.NL, tokenize.COMMENT):
                     continue
                 line_tokens.append(token.string)
-            if holder and line_tokens:
-                tokens.append(holder)
-                tokens.append(indentation)
-            tokens += line_tokens
         except tokenize.TokenError:
             pass
+        if holder and line_tokens:
+            tokens.append(holder)
+            tokens.append(indentation)
+        tokens += line_tokens
 
     return tokens
+
+multiline_diff = """+ result = foo(
++     a,
++ )"""
+
+print(tokenize_diff(multiline_diff))
