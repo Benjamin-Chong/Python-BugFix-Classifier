@@ -16,7 +16,7 @@ class BugFixClassifier(nn.Module):
         token_sums = masked.sum(dim=1) #sum all of the embeddings
         token_counts = unsqueezed.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
 
-        mean_pooling = token_sums / token_counts #results: (batchsize, maxlen) results in a tensor using broadcasting
+        mean_pooling = token_sums / token_counts #results: (batchsize, 128) results in a tensor using broadcasting
         logits = self.classifier(mean_pooling) #results: (batchsize, scores) pass data through the layer
         return logits
 
@@ -27,6 +27,7 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
     #3 Apply Backpropagation
     #4 Update Weights (Optimzer)
 
+    history = {'train_loss': [], 'train_accuracy': [], 'validation_loss': [], 'validation_accuracy': []}
     best_validation_loss = float('inf') #used for saving the best model later
     for epoch in range(epochs):
         model.train() #put the model into train mode
@@ -75,3 +76,10 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
 
         if print_stats:
             print(f'Epoch: {epoch + 1}, Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.4f} Validation Loss: {validation_epoch_loss:.4f} Validation Accuracy: {validation_accuracy:.4f}')
+
+        history['train_loss'].append(train_loss)
+        history['train_accuracy'].append(train_accuracy)
+        history['validation_loss'].append(validation_epoch_loss)
+        history['validation_accuracy'].append(validation_accuracy)
+
+    return history

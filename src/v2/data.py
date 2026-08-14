@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
 from torch.utils.data import Dataset
 
-class BugFixDataset(Dataset): #adapterr that makes our pandas data understandabnle to PyTorch
+class BugFixDataset(Dataset): #adapter that makes our pandas data understandable to PyTorch
     def __init__(self, dataframe):
         super().__init__()
         self.dataframe = dataframe
@@ -25,7 +24,7 @@ def my_collate_fn(batch): #batch has tensors for tokens, labels. used to create 
         amount_of_padding = batch_max_length - len(tokens)
         pads = torch.zeros(amount_of_padding, dtype=torch.long, device=tokens.device) #adds 0s
         padded_sequence = torch.cat((tokens, pads)) #torch.cat returns a new object
-        assert torch.equal(padded_sequence[:len(tokens)], tokens) #ensures that the padded sequence real tokens and the original tokens are still equel
+        assert torch.equal(padded_sequence[:len(tokens)], tokens) #ensures that the padded sequence real tokens and the original tokens are still equal
         padded_token_tensors.append(padded_sequence)
 
     stacked_padded_tokens = torch.stack(padded_token_tensors) #list -> 1 tensor
