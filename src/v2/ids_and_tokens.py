@@ -1,4 +1,4 @@
-def create_token_to_id(all_tokens): #expecting a dictionary 
+def create_token_to_id(all_tokens): #accepts an iterable of retained tokens
     mapping = {'<PAD>':0, '<UNK>':1}
     tokens = set(all_tokens)
 

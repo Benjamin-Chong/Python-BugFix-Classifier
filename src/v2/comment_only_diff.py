@@ -1,4 +1,4 @@
-def is_comment_only(diff): #returns true or false depending on if the comment only contains comments
+def is_comment_only(diff): #returns true when every changed non-empty line is a comment
     lines = diff.splitlines()
 
     for line in lines:
