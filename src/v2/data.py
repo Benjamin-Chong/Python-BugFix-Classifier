@@ -13,7 +13,7 @@ class BugFixDataset(Dataset): #adapter that makes our pandas data understandable
         return torch.tensor(tokens_in_ids, dtype=torch.long), torch.tensor(label_id, dtype=torch.long)
 
 
-def my_collate_fn(batch): #batch has tensors for tokens, labels. used to create a rectangular shape so matrix operations can be applied
+def collate_batch(batch): #batch has tensors for tokens, labels. used to create a rectangular shape so matrix operations can be applied
     token_tensors, label_tensors = zip(*batch) #after zipping both return the tensors and the labels
     batch_max_length = 0 #find the max length for proper matrix multiplication (shape)
     for tokens in token_tensors: #find the max length

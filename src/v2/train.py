@@ -2,19 +2,22 @@ import torch.nn as nn
 import torch
 
 class BugFixClassifier(nn.Module):
-    def __init__(self):
+    def __init__(self, vocab_size, embedding_dimension, num_classes, padding_index):
         super().__init__()
-        self.embeddings = nn.Embedding(num_embeddings=947, embedding_dim=128, padding_idx=0)
-        self.classifier = nn.Linear(128,5) #Layer creation
+        self.embeddings = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embedding_dimension, padding_idx=padding_index)
+        self.classifier = nn.Linear(embedding_dimension, num_classes) #Layer creation
 
     def forward(self, tokens, padding_mask):
         embedded_tokens = self.embeddings(tokens) # starts as: (batchsize, maxlen) -> (batchsize, maxlen, embeddingdim)
         real_token_mask = (~padding_mask).int() #starts as: (batchsize, maxlen) -> (batchsize, maxlen) results in 1s/0s each diff has a vector of 1s/0s rather than the True and False
         unsqueezed = real_token_mask.unsqueeze(dim=2) #starts as: (batchsize, maxlen) -> (batchsize, maxlen, 1) for broadcasting later
-        masked = embedded_tokens * unsqueezed #results: (batchsize, maxlen, embeddingdim) retrains values for embeddings that are real tokens. pads are reduced to 0
+        masked = embedded_tokens * unsqueezed #results: (batchsize, maxlen, embeddingdim) retains values for embeddings that are real tokens. pads are reduced to 0
 
         token_sums = masked.sum(dim=1) #sum all of the embeddings
         token_counts = unsqueezed.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
+
+        if (token_counts == 0).any():
+            raise ValueError('Cannot mean-pool a sequence containing no real tokens.')
 
         mean_pooling = token_sums / token_counts #results: (batchsize, 128) results in a tensor using broadcasting
         logits = self.classifier(mean_pooling) #results: (batchsize, scores) pass data through the layer
