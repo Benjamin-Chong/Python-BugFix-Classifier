@@ -8,10 +8,10 @@ class BugFixClassifier(nn.Module):
         self.classifier = nn.Linear(embedding_dimension, num_classes) #Layer creation
 
     def forward(self, tokens, padding_mask):
-        embedded_tokens = self.embeddings(tokens) # starts as: (batchsize, maxlen) -> (batchsize, maxlen, embeddingdim)
+        embedded_tokens = self.embeddings(tokens) # starts as: (batchsize, maxlen) -> (batchsize, maxlen, embedding_dimension)
         real_token_mask = (~padding_mask).int() #starts as: (batchsize, maxlen) -> (batchsize, maxlen) results in 1s/0s each diff has a vector of 1s/0s rather than the True and False
         unsqueezed = real_token_mask.unsqueeze(dim=2) #starts as: (batchsize, maxlen) -> (batchsize, maxlen, 1) for broadcasting later
-        masked = embedded_tokens * unsqueezed #results: (batchsize, maxlen, embeddingdim) retains values for embeddings that are real tokens. pads are reduced to 0
+        masked = embedded_tokens * unsqueezed #results: (batchsize, maxlen, embedding_dimension) retains values for embeddings that are real tokens. pads are reduced to 0
 
         token_sums = masked.sum(dim=1) #sum all of the embeddings
         token_counts = unsqueezed.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
@@ -19,8 +19,8 @@ class BugFixClassifier(nn.Module):
         if (token_counts == 0).any():
             raise ValueError('Cannot mean-pool a sequence containing no real tokens.')
 
-        mean_pooling = token_sums / token_counts #results: (batchsize, 128) results in a tensor using broadcasting
-        logits = self.classifier(mean_pooling) #results: (batchsize, scores) pass data through the layer
+        mean_pooling = token_sums / token_counts #results: (batchsize, embedding_dimension) results in a tensor using broadcasting
+        logits = self.classifier(mean_pooling) #results: (batchsize, num_classes) pass data through the layer
         return logits
 
 def train_model(model, train_loader, validation_loader, criterion, optimizer, epochs, checkpoint_path='models/v2_best_model.pt', print_stats=True):
@@ -28,7 +28,7 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
     #1 Predict 
     #2 Compute Loss (criterion)
     #3 Apply Backpropagation
-    #4 Update Weights (Optimzer)
+    #4 Update Weights (Optimizer)
 
     history = {'train_loss': [], 'train_accuracy': [], 'validation_loss': [], 'validation_accuracy': []}
     best_validation_loss = float('inf') #used for saving the best model later
