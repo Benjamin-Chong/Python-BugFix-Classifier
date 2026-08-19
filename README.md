@@ -1,4 +1,4 @@
-# Python Bug Pattern Classifier
+# Python Bug-Fix Classifier
 
 An ML experimentation project that classifies bug patterns from buggy and fixed Python code pairs.
 
@@ -18,7 +18,17 @@ The project currently contains three completed versions:
 
 * **V1:** TF-IDF with classical machine learning classifiers
 * **V2:** Learned token embeddings with masked mean pooling in PyTorch
-* **V3:** Sequence-aware Transformer encoder with positional encoding and self-attention in PyTorch.
+* **V3:** Sequence-aware Transformer encoder with positional encoding and self-attention in PyTorch
+
+## Results at a Glance
+
+| Model | Test Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|
+| V1 TF-IDF + Logistic Regression | 0.7068 | 0.5888 | 0.6755 |
+| V2 Embeddings + Mean Pooling | 0.7725 | 0.7120 | 0.7687 |
+| V3 Transformer Encoder | **0.8752** | **0.8384** | **0.8725** |
+
+V3 achieved the strongest overall test performance and improved every class-level F1 score over V2.
 
 ---
 
@@ -133,7 +143,7 @@ The original V1 training set was divided into:
 
 The split used a fixed random seed and stratification to preserve the class distribution.
 
-The original test set was not used during V2 development.
+The original test split was not re-evaluated during V2 development. V2 vocabulary, model, and checkpoint decisions used only the training and validation splits.
 
 ### Architecture
 
@@ -209,10 +219,10 @@ To create a fair comparison, I retrained the V1 Logistic Regression model using 
 
 The TF-IDF vectorizer was fitted only on the V2 training data. Both models were then evaluated on the same **5,703 validation examples**.
 
-| Model                           | Validation Accuracy | Macro F1 | Weighted F1 |
-| ------------------------------- | ------------------: | -------: | ----------: |
-| V1 TF-IDF + Logistic Regression |              0.7058 |   0.5891 |      0.6769 |
-| V2 Embeddings + Mean Pooling    |              0.7780 |   0.7249 |      0.7748 |
+| Model | Validation Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|
+| V1 TF-IDF + Logistic Regression | 0.7058 | 0.5891 | 0.6769 |
+| V2 Embeddings + Mean Pooling | 0.7780 | 0.7249 | 0.7748 |
 
 Compared with the retrained V1 model, V2 improved:
 
@@ -278,14 +288,16 @@ V2 learns token representations, but masked mean pooling averages those represen
 
 The remaining errors are consistent with the hypothesis that `expression` and `identifier` require relationships between tokens and surrounding code structure that mean pooling cannot represent. The current evidence does not prove that missing sequence context is the cause, but it gives V3 a clear hypothesis to test.
 
-V3 introduces a sequence-aware architecture while preserving the same development split and evaluation methodology.
+V3 introduced a sequence-aware architecture while preserving the same development split and evaluation methodology.
 
 ---
 
-## V3: Sequence-Aware Tranformer Classifier
+## V3: Sequence-Aware Transformer Classifier
 
 ### Architecture
+
 V3 extends V2 while preserving the same tokenizer, vocabulary, data splits, and 128-dimensional token embeddings. This controlled design allowed the experiment to focus on whether sequence-aware contextualization would improve classification performance.
+
 V3 introduces the following architectural components:
 
 1. Sinusoidal positional encoding with a maximum sequence length of `1024`
@@ -300,6 +312,7 @@ V3 introduces the following architectural components:
 V2 mean-pools independent token embeddings, while V3 first contextualizes each token using its position and relationships with other tokens. It then mean-pools those contextualized representations before classification.
 
 ### Training Configuration
+
 * Random seed: **42**
 * Batch size: **32**
 * Embedding dimension: **128**
@@ -312,20 +325,24 @@ V2 mean-pools independent token embeddings, while V3 first contextualizes each t
 * Best validation loss: **0.3144**
 
 ### Validation Results
+
 | Model | Accuracy | Macro F1 | Weighted F1 |
 |---|---:|---:|---:|
 | V2 Embeddings + Mean Pooling | 0.7780 | 0.7249 | 0.7748 |
 | V3 Transformer Encoder | 0.8773 | 0.8356 | 0.8748 |
 
-V3 improved validation accuracy from **0.7780** to **0.8773**, macro F1 from **0.7249** to **0.8356**, and weighted F1 from **0.7748** to **0.8748**. The macro F1 improvement is especially meaningful because every class contributes equally to this metric, showing that V3’s gains were not driven only by the majority class. Expression F1 increased from **0.5786** to **0.7864**, while identifier F1 increased from **0.5941** to **0.7129**. These results support the hypothesis that the weaker classes benefited from sequence-aware contextualization. However, they do not prove that context alone caused the improvement because V3 also introduced additional model capacity through its Transformer encoder.
+V3 improved validation accuracy from **0.7780** to **0.8773**, macro F1 from **0.7249** to **0.8356**, and weighted F1 from **0.7748** to **0.8748**. The macro F1 improvement is especially meaningful because every class contributes equally to this metric, showing that V3’s gains were not driven only by the majority class. `expression` F1 increased from **0.5786** to **0.7864**, while `identifier` F1 increased from **0.5941** to **0.7129**. These results support the hypothesis that the weaker classes benefited from sequence-aware contextualization. However, they do not prove that context alone caused the improvement because V3 also introduced additional model capacity through its Transformer encoder.
 
+---
 
-## Final Test Set Comparison
+## Final Test-Set Comparison
 
 ### Evaluation Protocol
-All three models were frozen before the final evaluation and were evaluated on the same **7,129** held-out test examples. For the fair V1 comparison, the TF-IDF vectorizer was fitted and the Logistic Regression model was trained using only the **22,809** training examples. V2 and V3 used the same tokenizer, frozen vocabulary, numericalized test set, and DataLoader. The test set was used only for final evaluation and was not used for model selection or tuning.
+
+All three fair-comparison models were frozen before the final comparison and were evaluated on the same **7,129-example** test split. This split had previously been evaluated during the original V1 phase, before the validation protocol was introduced. For the fair V1 comparison, the TF-IDF vectorizer and Logistic Regression model were fitted using only the **22,809** training examples. V2 and V3 used the same tokenizer, frozen vocabulary, numericalized test set, and DataLoader. V2 and V3 checkpoint selection used only the **5,703-example** validation set, and no models were changed after the final comparison.
 
 ### Overall Test Results
+
 | Model | Accuracy | Macro F1 | Weighted F1 |
 |---|---:|---:|---:|
 | V1 TF-IDF + Logistic Regression | 0.7068 | 0.5888 | 0.6755 |
@@ -333,6 +350,7 @@ All three models were frozen before the final evaluation and were evaluated on t
 | V3 Transformer Encoder | 0.8752 | 0.8384 | 0.8725 |
 
 ### Test F1 by Class
+
 | Class | V1 | V2 | V3 |
 |---|---:|---:|---:|
 | Assignment | 0.6363 | 0.7348 | 0.8334 |
@@ -342,15 +360,22 @@ All three models were frozen before the final evaluation and were evaluated on t
 | Identifier | 0.3367 | 0.5225 | 0.7297 |
 
 ### Final Test Interpretation
-V3 achieved the best overall test performance, reaching **87.52%** accuracy, **0.8384** macro F1, and **0.8725** weighted F1. It improved on V2 across every class, with the largest F1 gains occurring for expression and identifier. These were the classes that were expected to benefit most from preserving token order and learning relationships between tokens. V3’s test results were also very close to its validation results, showing that the improvement generalized to unseen test data. However, identifier recall remained at **0.6250**, showing that the model still has difficulty identifying some examples from the smallest class. Overall, the results strongly support the hypothesis that, under this experimental setup, a sequence-aware Transformer representation is more effective than TF-IDF or mean-pooled token embeddings for this classification task.
+
+V3 achieved the best overall test performance, reaching **87.52%** accuracy, **0.8384** macro F1, and **0.8725** weighted F1. It improved on V2 across every class, with the largest F1 gains occurring for `expression` and `identifier`. These were the classes that were expected to benefit most from preserving token order and learning relationships between tokens. V3’s test results were also very close to its validation results, showing that its performance remained stable on examples excluded from model training. However, `identifier` recall remained at **0.6250**, showing that the model still has difficulty identifying some examples from the smallest class. Overall, the results strongly support the hypothesis that, under this experimental setup, a sequence-aware Transformer representation is more effective than TF-IDF or mean-pooled token embeddings for this classification task.
+
+---
 
 ## Limitations and Future Work
-- V3 added both sequence awareness and model capacity, so their individual effects were not isolated.
-- The `identifier` class remained small, with only `216` test examples.
-- Only one Transformer configuration was tested.
-- The model was evaluated on one Python bug-fix dataset, so performance may not generalize to other datasets or languages.
-- The positional encoding supports sequences up to `1,024` tokens.
-- Future work could use controlled ablation studies to isolate the effect of sequence context, compare model depths, and investigate strategies for inputs longer than `1,024` tokens.
+
+* V3 added both sequence awareness and model capacity, so their individual effects were not isolated.
+* The `identifier` class remained small, with only `216` test examples.
+* Only one Transformer configuration was tested.
+* The model was evaluated on one Python bug-fix dataset, so performance may not generalize to other datasets or languages.
+* The positional encoding supports sequences up to `1,024` tokens.
+* Future work could use controlled ablation studies to isolate the effect of sequence context, compare model depths, and investigate strategies for inputs longer than `1,024` tokens.
+* The original test split was evaluated during V1 before the validation protocol was introduced, so the final comparison is not based on a completely untouched test set.
+
+---
 
 ## Tech Stack
 
@@ -440,6 +465,6 @@ The V1 error-analysis and dataset-exploration notebooks are not required to trai
 
 The V2 evaluation notebook also creates the fairly retrained V1 vectorizer and Logistic Regression artifacts used by the final evaluation. These generated `.joblib` files are excluded from version control.
 
-The test split should remain untouched through the V3 validation comparison. The final evaluation notebook is evaluation-only and should not be used to make further model or hyperparameter changes.
+After the original V1 evaluation, V2 and V3 development used the training and validation splits. The final evaluation notebook compares the frozen fair V1, V2, and V3 artifacts on the common test split, and its results should not be used to make further model or hyperparameter changes.
 
 The preprocessing notebook may require Hugging Face authentication to access RunBugRun.

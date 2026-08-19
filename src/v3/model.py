@@ -6,7 +6,8 @@ class SinusoidalPositionalEncoding(nn.Module):
     def __init__(self, embedding_dim=128, max_length=1024):
         super().__init__()
 
-        assert embedding_dim % 2 == 0
+        if embedding_dim % 2 != 0:
+            raise ValueError('embedding_dim must be even.')
 
         positions = torch.arange(max_length, dtype=torch.float32).unsqueeze(1)
 
@@ -27,10 +28,10 @@ class SinusoidalPositionalEncoding(nn.Module):
         if sequence_length > self.positional_encoding.size(1):
             raise ValueError(f'Sequence length {sequence_length} exceeds ' f'maximum positional length ' f'{self.positional_encoding.size(1)}.')
 
-        return (embedded_tokens + self.positional_encoding[:, :sequence_length])
+        return embedded_tokens + self.positional_encoding[:, :sequence_length]
 
 class TransformerBugFixClassifier(nn.Module):
-    def __init__(self, vocab_size, embedding_dim, num_heads, num_layers, feedforward_dim, num_classes, max_length, padding_index, dropout=.1):
+    def __init__(self, vocab_size, embedding_dim, num_heads, num_layers, feedforward_dim, num_classes, max_length, padding_index, dropout=0.1):
         super().__init__()
         self.embeddings = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embedding_dim, padding_idx=padding_index)
         self.positional_encoding = SinusoidalPositionalEncoding(embedding_dim=embedding_dim, max_length=max_length)
@@ -43,15 +44,15 @@ class TransformerBugFixClassifier(nn.Module):
         position_aware_tokens = self.positional_encoding(embedded_tokens)
         contextualized_tokens = self.transformer_encoder(position_aware_tokens, src_key_padding_mask=padding_mask)
         real_token_mask = (~padding_mask).int() #starts as: (batchsize, maxlen) -> (batchsize, maxlen) results in 1s/0s each diff has a vector of 1s/0s rather than the True and False
-        unsqueezed = real_token_mask.unsqueeze(dim=2) #starts as: (batchsize, maxlen) -> (batchsize, maxlen, 1) for broadcasting later
-        masked = contextualized_tokens * unsqueezed #results: (batchsize, maxlen, embedding_dimension) retains values for embeddings that are real tokens. pads are reduced to 0
+        expanded_mask = real_token_mask.unsqueeze(dim=2) #starts as: (batchsize, maxlen) -> (batchsize, maxlen, 1) for broadcasting later
+        masked_tokens= contextualized_tokens * expanded_mask #results: (batchsize, maxlen, embedding_dimension) retains values for embeddings that are real tokens. pads are reduced to 0
 
-        token_sums = masked.sum(dim=1) #sum all of the embeddings
-        token_counts = unsqueezed.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
+        token_sums = masked_tokens.sum(dim=1) #sum all of the embeddings
+        token_counts = expanded_mask.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
 
         if (token_counts == 0).any():
             raise ValueError('Cannot mean-pool a sequence containing no real tokens.')
 
-        mean_pooling = token_sums / token_counts #results: (batchsize, embedding_dimension) results in a tensor using broadcasting
-        logits = self.classifier(mean_pooling) #results: (batchsize, num_classes) pass data through the layer
+        pooled_representation = token_sums / token_counts #results: (batchsize, embedding_dimension) results in a tensor using broadcasting
+        logits = self.classifier(pooled_representation) #results: (batchsize, num_classes) pass data through the layer
         return logits
