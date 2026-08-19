@@ -29,7 +29,7 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
     #2 Compute Loss (criterion)
     #3 Apply Backpropagation
     #4 Update Weights (Optimizer)
-
+    device = next(model.parameters()).device
     history = {'train_loss': [], 'train_accuracy': [], 'validation_loss': [], 'validation_accuracy': []}
     best_validation_loss = float('inf') #used for saving the best model later
     for epoch in range(epochs):
@@ -39,6 +39,9 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
         total_examples = 0
 
         for tokens, labels, padding_mask in train_loader:
+            tokens = tokens.to(device)
+            labels = labels.to(device)
+            padding_mask = padding_mask.to(device)
             optimizer.zero_grad() #resets the gradient
 
             logits = model(tokens, padding_mask) #forward pass
@@ -63,6 +66,9 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, ep
 
         with torch.no_grad(): #no gradient needed since no weights are changing
             for tokens, labels, padding_mask in validation_loader:
+                tokens = tokens.to(device)
+                labels = labels.to(device)
+                padding_mask = padding_mask.to(device)
                 logits = model(tokens, padding_mask) #forward pass
                 loss = criterion(logits, labels)  #compute loss
 

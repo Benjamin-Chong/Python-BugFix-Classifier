@@ -8,8 +8,12 @@ def evaluate_model(model, criterion, loader):
     all_labels = []
 
     model.eval()
+    device = next(model.parameters()).device
     with torch.no_grad():
         for tokens, labels, padding_mask in loader:
+            tokens = tokens.to(device)
+            labels = labels.to(device)
+            padding_mask = padding_mask.to(device)
             logits = model(tokens, padding_mask)
             batch_loss = criterion(logits, labels)
             

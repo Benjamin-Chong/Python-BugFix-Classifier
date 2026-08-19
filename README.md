@@ -14,12 +14,11 @@ Given the difference between buggy and fixed Python code, the model predicts one
 * `expression`
 * `identifier`
 
-The project currently contains two completed versions:
+The project currently contains three completed versions:
 
 * **V1:** TF-IDF with classical machine learning classifiers
 * **V2:** Learned token embeddings with masked mean pooling in PyTorch
-
-V3 will test whether a sequence-aware architecture can address the remaining limitations of V2.
+* **V3:** Transformer Model with token embeddings with self-attention in PyTorch
 
 ---
 
