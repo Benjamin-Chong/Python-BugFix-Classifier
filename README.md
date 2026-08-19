@@ -18,7 +18,7 @@ The project currently contains three completed versions:
 
 * **V1:** TF-IDF with classical machine learning classifiers
 * **V2:** Learned token embeddings with masked mean pooling in PyTorch
-* **V3:** Transformer Model with token embeddings with self-attention in PyTorch
+* **V3:** Sequence-aware Transformer encoder with positional encoding and self-attention in PyTorch.
 
 ---
 
@@ -114,7 +114,7 @@ For example, `control_flow` was strongly associated with tokens such as:
 
 The models struggled with `expression` and `identifier`. These classes did not have the same clear token-level indicators and were frequently predicted as `call` or `assignment`.
 
-The full V1 analysis is available in [`04_error_analysis.ipynb`](notebooks/notebooks_v1/04_error_analysis.ipynb).
+The full V1 analysis is available in [`04_error_analysis.ipynb`](notebooks/v1/04_error_analysis.ipynb).
 
 These results motivated V2, where I replaced the fixed TF-IDF representation with token embeddings learned during training.
 
@@ -278,11 +278,79 @@ V2 learns token representations, but masked mean pooling averages those represen
 
 The remaining errors are consistent with the hypothesis that `expression` and `identifier` require relationships between tokens and surrounding code structure that mean pooling cannot represent. The current evidence does not prove that missing sequence context is the cause, but it gives V3 a clear hypothesis to test.
 
-V3 will introduce a sequence-aware architecture while preserving the same development split and evaluation methodology.
-
-The final test-set comparison will occur only after V1, V2, and V3 are frozen.
+V3 introduces a sequence-aware architecture while preserving the same development split and evaluation methodology.
 
 ---
+
+## V3: Sequence-Aware Tranformer Classifier
+
+### Architecture
+V3 extends V2 while preserving the same tokenizer, vocabulary, data splits, and 128-dimensional token embeddings. This controlled design allowed the experiment to focus on whether sequence-aware contextualization would improve classification performance.
+V3 introduces the following architectural components:
+
+1. Sinusoidal positional encoding with a maximum sequence length of `1024`
+2. Two Transformer encoder layers
+3. Four self-attention heads
+4. A feed-forward dimension of `256`
+5. Dropout of `0.1`
+6. Padding-aware self-attention
+7. Masked mean pooling after contextualization
+8. A final `Linear(128, 5)` classifier
+
+V2 mean-pools independent token embeddings, while V3 first contextualizes each token using its position and relationships with other tokens. It then mean-pools those contextualized representations before classification.
+
+### Training Configuration
+* Random seed: **42**
+* Batch size: **32**
+* Embedding dimension: **128**
+* Optimizer: **Adam**
+* Learning rate: **0.001**
+* Epochs: **15**
+* Loss function: **Cross-Entropy Loss**
+* Checkpoint criterion: **Lowest validation loss**
+* Selected checkpoint: **Epoch 10**
+* Best validation loss: **0.3144**
+
+### Validation Results
+| Model | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|
+| V2 Embeddings + Mean Pooling | 0.7780 | 0.7249 | 0.7748 |
+| V3 Transformer Encoder | 0.8773 | 0.8356 | 0.8748 |
+
+V3 improved validation accuracy from **0.7780** to **0.8773**, macro F1 from **0.7249** to **0.8356**, and weighted F1 from **0.7748** to **0.8748**. The macro F1 improvement is especially meaningful because every class contributes equally to this metric, showing that V3’s gains were not driven only by the majority class. Expression F1 increased from **0.5786** to **0.7864**, while identifier F1 increased from **0.5941** to **0.7129**. These results support the hypothesis that the weaker classes benefited from sequence-aware contextualization. However, they do not prove that context alone caused the improvement because V3 also introduced additional model capacity through its Transformer encoder.
+
+
+## Final Test Set Comparison
+
+### Evaluation Protocol
+All three models were frozen before the final evaluation and were evaluated on the same **7,129** held-out test examples. For the fair V1 comparison, the TF-IDF vectorizer was fitted and the Logistic Regression model was trained using only the **22,809** training examples. V2 and V3 used the same tokenizer, frozen vocabulary, numericalized test set, and DataLoader. The test set was used only for final evaluation and was not used for model selection or tuning.
+
+### Overall Test Results
+| Model | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|
+| V1 TF-IDF + Logistic Regression | 0.7068 | 0.5888 | 0.6755 |
+| V2 Embeddings + Mean Pooling | 0.7725 | 0.7120 | 0.7687 |
+| V3 Transformer Encoder | 0.8752 | 0.8384 | 0.8725 |
+
+### Test F1 by Class
+| Class | V1 | V2 | V3 |
+|---|---:|---:|---:|
+| Assignment | 0.6363 | 0.7348 | 0.8334 |
+| Call | 0.8133 | 0.8401 | 0.9128 |
+| Control Flow | 0.8673 | 0.8920 | 0.9439 |
+| Expression | 0.2902 | 0.5703 | 0.7722 |
+| Identifier | 0.3367 | 0.5225 | 0.7297 |
+
+### Final Test Interpretation
+V3 achieved the best overall test performance, reaching **87.52%** accuracy, **0.8384** macro F1, and **0.8725** weighted F1. It improved on V2 across every class, with the largest F1 gains occurring for expression and identifier. These were the classes that were expected to benefit most from preserving token order and learning relationships between tokens. V3’s test results were also very close to its validation results, showing that the improvement generalized to unseen test data. However, identifier recall remained at **0.6250**, showing that the model still has difficulty identifying some examples from the smallest class. Overall, the results strongly support the hypothesis that, under this experimental setup, a sequence-aware Transformer representation is more effective than TF-IDF or mean-pooled token embeddings for this classification task.
+
+## Limitations and Future Work
+- V3 added both sequence awareness and model capacity, so their individual effects were not isolated.
+- The `identifier` class remained small, with only `216` test examples.
+- Only one Transformer configuration was tested.
+- The model was evaluated on one Python bug-fix dataset, so performance may not generalize to other datasets or languages.
+- The positional encoding supports sequences up to `1,024` tokens.
+- Future work could use controlled ablation studies to isolate the effect of sequence context, compare model depths, and investigate strategies for inputs longer than `1,024` tokens.
 
 ## Tech Stack
 
@@ -307,51 +375,71 @@ Planned deployment tools:
 
 ```text
 notebooks/
-├── notebooks_v1/
+├── v1/
 │   ├── 01_preprocessing.ipynb
 │   ├── 02_create_splits.ipynb
 │   ├── 03_baseline_models.ipynb
 │   ├── 04_error_analysis.ipynb
 │   └── 05_dataset_explorations.ipynb
-└── notebooks_v2/
-    ├── 01_creating_validation.ipynb
-    ├── 02_tokenizer.ipynb
-    ├── 03_vocabulary.ipynb
-    ├── 04_model.ipynb
-    └── 05_evaluation.ipynb
+├── v2/
+│   ├── 01_creating_validation.ipynb
+│   ├── 02_tokenizer.ipynb
+│   ├── 03_vocabulary.ipynb
+│   ├── 04_model.ipynb
+│   └── 05_evaluation.ipynb
+└── v3/
+    ├── 01_transformer_model.ipynb
+    ├── 02_evaluation_v2_v3.ipynb
+    └── 03_final_evaluation.ipynb
 
 src/
 ├── preprocessing.py
-└── v2/
-    ├── comment_only_diff.py
-    ├── data.py
-    ├── evaluate.py
-    ├── ids_and_tokens.py
-    ├── tokenize_diff.py
-    └── train.py
+├── v2/
+│   ├── comment_only_diff.py
+│   ├── data.py
+│   ├── evaluate.py
+│   ├── ids_and_tokens.py
+│   ├── tokenize_diff.py
+│   └── train.py
+└── v3/
+    └── model.py
 
 models/
-└── v2_best_model.pt
+├── v2_best_model.pt
+└── v3_best_model.pt
 ```
 
 ---
 
-## Reproducing V2
+## Reproducing the Full Experiment
 
-Install the required dependencies:
+Install the required dependencies from the repository root:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The processed datasets are not committed to the repository. Run the notebooks in this order to regenerate them:
+The raw and processed datasets are not committed to the repository. Run the required notebooks in the following order:
 
-1. `notebooks/notebooks_v1/01_preprocessing.ipynb`
-2. `notebooks/notebooks_v1/02_create_splits.ipynb`
-3. `notebooks/notebooks_v2/01_creating_validation.ipynb`
-4. `notebooks/notebooks_v2/02_tokenizer.ipynb`
-5. `notebooks/notebooks_v2/03_vocabulary.ipynb`
-6. `notebooks/notebooks_v2/04_model.ipynb`
-7. `notebooks/notebooks_v2/05_evaluation.ipynb`
+1. `notebooks/v1/01_preprocessing.ipynb`
+2. `notebooks/v1/02_create_splits.ipynb`
+3. `notebooks/v1/03_baseline_models.ipynb`
+4. `notebooks/v2/01_creating_validation.ipynb`
+5. `notebooks/v2/02_tokenizer.ipynb`
+6. `notebooks/v2/03_vocabulary.ipynb`
+7. `notebooks/v2/04_model.ipynb`
+8. `notebooks/v2/05_evaluation.ipynb`
+9. `notebooks/v3/01_transformer_model.ipynb`
+10. `notebooks/v3/02_evaluation_v2_v3.ipynb`
+11. `notebooks/v3/03_final_evaluation.ipynb`
+
+The V1 error-analysis and dataset-exploration notebooks are not required to train the final models, but they contain additional analysis:
+
+* `notebooks/v1/04_error_analysis.ipynb`
+* `notebooks/v1/05_dataset_explorations.ipynb`
+
+The V2 evaluation notebook also creates the fairly retrained V1 vectorizer and Logistic Regression artifacts used by the final evaluation. These generated `.joblib` files are excluded from version control.
+
+The test split should remain untouched through the V3 validation comparison. The final evaluation notebook is evaluation-only and should not be used to make further model or hyperparameter changes.
 
 The preprocessing notebook may require Hugging Face authentication to access RunBugRun.
