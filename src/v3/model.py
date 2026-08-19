@@ -45,7 +45,7 @@ class TransformerBugFixClassifier(nn.Module):
         contextualized_tokens = self.transformer_encoder(position_aware_tokens, src_key_padding_mask=padding_mask)
         real_token_mask = (~padding_mask).int() #starts as: (batchsize, maxlen) -> (batchsize, maxlen) results in 1s/0s each diff has a vector of 1s/0s rather than the True and False
         expanded_mask = real_token_mask.unsqueeze(dim=2) #starts as: (batchsize, maxlen) -> (batchsize, maxlen, 1) for broadcasting later
-        masked_tokens= contextualized_tokens * expanded_mask #results: (batchsize, maxlen, embedding_dimension) retains values for embeddings that are real tokens. pads are reduced to 0
+        masked_tokens = contextualized_tokens * expanded_mask #results: (batchsize, maxlen, embedding_dimension) retains values for embeddings that are real tokens. pads are reduced to 0
 
         token_sums = masked_tokens.sum(dim=1) #sum all of the embeddings
         token_counts = expanded_mask.sum(dim=1) #sum all of the real tokens (True = 1, False = 0)
