@@ -202,3 +202,39 @@ button:hover {
     color: var(--text);
 }
 
+/*Start of CSS for aboutpage*/
+.center {
+    display:flex;
+    gap: 3rem;
+}
+
+.labels_progression {
+    border: solid;
+    border-color: var(--border);
+    padding: 1rem;
+}
+
+.progression {
+    margin-top: 1rem;
+}
+.center h2, .center p, .center ul, .center li, .center strong{
+    color: var(--text);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.center a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.center a:hover {
+    color: var(--accent-hover);
+    text-decoration: none;
+}
+
+.limitations_credits {
+    border: solid;
+    border-color: var(--border);
+    padding: 1rem;
+}

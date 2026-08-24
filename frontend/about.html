@@ -2,13 +2,71 @@
 <html>
     <head>
         <title>About Page</title>
-        <link rel="stylesheet" href="styles.css"
+        <link rel="stylesheet" href="styles.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="predict.js" defer></script>
     </head>
     <body>
+        <main>
+            <h1>Python Bug-Fix Classifier</h1>
+            <p>About the Project</p>
+        </main>
         <nav>
             <a href="index.html">Home</a>
             <a href="predict.html">Predict the Bug Fix</a>
             <a href="about.html">About</a>
         </nav>
+        <div class="center">
+            <div class="labels_progression">
+                <div class="labels">
+                    <h2>Disclaimer</h2>
+                    <p>This is a machine-learning model and it can make mistakes. When entering your buggy and fixed code, the label may not be representative of your expected fix. Please refer to the section below.</p>
+                    <h2>Label Explainations From RunBugRun</h2>
+                    <ol>
+                        <li>Assignement: the fix changes an assignment, such as the value being assigned, the assignment target, or the assignment operator.</li>
+                        <li>Call: the fix adds, removes, or modifies a function/method call, including its arguments.</li>
+                        <li>Control Flow: the fix changes how execution proceeds, such as an if condition, loop, branch, break, continue, or return.</li>
+                        <li>Expression: the fix changes an expression or operation, such as arithmetic, comparison, binary, or unary, operators.</li>
+                        <li>Identifier: the fix changes an identifier such as a variable, function, method, or attribute name.</li>
+                    </ol>
+                    <strong>RunBugRun uses a hierarchical, multi-label taxonomy containing 136 fine-grained leaf labels and 16 broader stem labels. A single bug may receive multiple labels. This project simplifies that taxonomy into five mutually exclusive categories for classification.</strong>
+                </div>
+                <div class="progression">
+                    <h2>Progression:</h2>
+                    <ol>
+                        <li>This project initially was supposed to be a Pytorch only model that performed the prediction, but evolved into a more complex project as I went along.</li>
+                        <li>I started by refining the project into two parts, V1 and V2. V1 was the classical machine learning model using scikit-learn with a TF-IDF algorithm in order create the representation for the model. V2 was originally supposed to be a transformer model.</li>
+                        <li>Following the completion of V1, I decided to make V2 a classifier with an additional dimension (embeddings) in order to make a more detailed conclusion when comparing V2 against V3</li>
+                        <li>The project finally concluded with V3, where I performed a careful analysis comparing the three models and their metrics, such as F1, confusion matrices, and accuracy</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="limitations_credits">
+                <div class="limitations">
+                    <h2>Limitations</h2>
+                    <ul>
+                        <li>This application predicts the type of code change, not whether the submitted fix is correct.</li>
+                        <li>It only supports Python code.</li>
+                        <li>RunBugRun's original multi-label taxonomy was simplified into five single-label categories.</li>
+                        <li>The models were trained on short programming solutions, so predictions may not be able to generalize to large production codebases.</li>
+                        <li>A diff may contain several kinds of changes, but each model returns only one category.</li>
+                        <li>V3 accepts at most 1,024 tokens.</li>
+                        <li>The models may disagree or preform poorly on small, artificial, or unfamiliar examples.</li>
+                    </ul>
+                </div>
+                <div class="credits">
+                    <h2>Credits</h2>
+                    <p>Developed by Benjamin Chong</p>
+                    <p>This project uses Python bug-fix data and hierarchical change labels from RunBugRun, created by Julian Aron Prenner and Romain Robbes using programming-contest submissions from IBM Project CodeNet.</p>
+                    <p>Tech Stack: Python, Pytorch, scikit-learn, FastAPI, HTML, CSS, JavaScript</p>
+                    <ul>
+                        <li><a href="https://github.com/giganticode/run_bug_run">Link to the GitHub for RunBugRun</a></li>
+                        <li><a href="https://arxiv.org/abs/2304.01102">Link to the Paper for RunBugRun</a></li>
+                        <li><a href="https://huggingface.co/datasets/iberu/RunBugRun">Link to the HuggingFace RunBugRun</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
