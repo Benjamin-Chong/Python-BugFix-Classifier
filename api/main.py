@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi.responses import RedirectResponse
 from src.preprocessing import generate_diff
 from api.inference import all_predictions
 from pathlib import Path
@@ -21,7 +22,7 @@ class PredictionRequest(BaseModel):
 
 @app.get('/')
 async def root():
-    return {'message': 'Hello world'}
+    return RedirectResponse('/frontend/index.html')
 
 @app.get('/health')
 async def health_check():
@@ -30,5 +31,8 @@ async def health_check():
 @app.post('/predict')
 async def predict(request: PredictionRequest):
     diff = generate_diff(request.buggy_code, request.fixed_code)
-    predictions = all_predictions(diff)
+    try:
+        predictions = all_predictions(diff)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
     return {'diff': diff, 'all_predictions' : predictions}

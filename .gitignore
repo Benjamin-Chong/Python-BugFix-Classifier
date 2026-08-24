@@ -11,14 +11,6 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/
-data/processed/
-
-# Models
-models/*.pkl
-models/*.joblib
-
 # Reports
 reports/figures/*.png
 

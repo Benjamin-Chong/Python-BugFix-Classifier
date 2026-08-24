@@ -11,7 +11,6 @@ const generated_diff = document.getElementById('generated_diff');
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    results.hidden = true;
     try {
         const buggy_val = buggy_input.value;
         const fixed_val = fixed_input.value;
@@ -41,6 +40,7 @@ form.addEventListener('submit', async (event) => {
             v1_result.textContent = "—";
             v2_result.textContent = "—";
             v3_result.textContent = "—";
+            message.textContent = "Status: " + error.message;
             throw new Error("The server could not process this prediction. Please try again.");
         }
 
@@ -48,12 +48,11 @@ form.addEventListener('submit', async (event) => {
             throw new Error(data.detail || 'Prediction failed.');
         }
 
-        v1_result.textContent = data.all_predictions.v1_prediction;
-        v2_result.textContent = data.all_predictions.v2_prediction;
-        v3_result.textContent = data.all_predictions.v3_prediction;
+        v1_result.textContent = data.all_predictions.v1_prediction.replaceAll("_", " ");
+        v2_result.textContent = data.all_predictions.v2_prediction.replaceAll("_", " ");
+        v3_result.textContent = data.all_predictions.v3_prediction.replaceAll("_", " ");
         displayDiff(data.diff);
         message.textContent = 'Status: ' + 'Prediction Generated!';
-        results.hidden= false;
     } catch (error) {
         message.textContent = 'Status: ' + error.message;
     } finally {
@@ -68,6 +67,7 @@ function displayDiff(diff) {
 
     for (const line of lines) {
         const diffLine = document.createElement("span");
+        diffLine.classList.add("diff-line");
 
         if (line.startsWith("+")) {
             diffLine.classList.add("diff-added");
