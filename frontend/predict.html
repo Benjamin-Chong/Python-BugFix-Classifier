@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Predict Page</title>
+        <link rel="stylesheet" href="styles.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="predict.js" defer></script>
+    </head>
+    <body>
+        <main>
+            <h1>Python Bug-Fix Classifier</h1>
+            <p>Enter the buggy and fixed versions of your Python code.</p>
+        </main>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="predict.html">Predict the Bug Fix</a>
+            <a href="about.html">About</a>
+        </nav>
+        <form id="prediction_form">
+            <div class="code_status">
+                <p id="status_message" role="status" aria-live="polite">Status: Make a prediction!</p>
+                <div class="code_field">
+                    <label for="buggy_code">Buggy Python Code:</label>
+                    <textarea id="buggy_code" required spellcheck="false" placeholder="Paste the buggy code here..."></textarea>
+                    </div>
+                <div class="code_field">
+                    <label for="fixed_code">Fixed Python Code:</label>
+                    <textarea id="fixed_code" required spellcheck="false" placeholder="Paste the fixed code here..."></textarea>
+                </div>
+                <button type="submit" id="predict_button">Predict!</button>
+            </div>
+            <section id="results">
+                <div class="diff">
+                    <h2>Generated Diff</h2>
+                    <pre id="generated_diff">No code has been passed through!</pre>
+                </div>
+                <section id="predictions">
+                    <div class="V1">
+                        <h2>V1 Prediction</h2>
+                        <p id="v1_prediction">No code has been passed through...</p>
+                    </div>
+                    <div class="V2">
+                        <h2>V2 Prediction</h2>
+                        <p id="v2_prediction">No code has been passed through...</p>
+                    </div>
+                    <div class="V3">
+                        <h2>V3 Prediction</h2>
+                        <p id="v3_prediction">No code has been passed through...</p>
+                    </div>
+                </section>
+            </section>
+        </form>
+    </body>
+</html>

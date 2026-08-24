@@ -1,0 +1,204 @@
+:root {
+  --background: #101816;
+  --surface: #18241f;
+  --surface-raised: #20332b;
+  --text: #f2f5ed;
+  --muted-text: #aab8af;
+  --accent: #a8c686;
+  --accent-hover: #8fb56f;
+  --border: #344b3f;
+  --added: #78b990;
+  --removed: #d97a7a;
+}
+
+nav {
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+nav a, nav a:hover {
+    border: solid;
+    border-color: var(--border);
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    color: var(--accent);
+}
+
+nav a:hover {
+    background-color: var(--surface-raised);
+    color: var(--accent-hover);
+}
+
+body {
+    background-color: var(--background);
+    padding: 2rem;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+main h1, main p {
+    margin: 0;
+    color: var(--text);
+    background-color: var(--surface);
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border: solid;
+    border-color: var(--border);
+}
+
+form label, form textarea, form h2, form p, form pre {
+    color: var(--text);
+    background-color: var(--surface);
+    border: solid;
+    border-color: var(--border);
+    padding: 0.5rem 1rem;
+}
+
+form textarea {
+    resize: none;
+    overflow-y: scroll;
+    scrollbar-color: var(--accent) var(--background);
+    min-height: 5rem;
+    scrollbar-width: thin;
+    overflow-y: auto;
+}
+
+form textarea:hover {
+    scrollbar-color: var(--accent-hover) var(--background);
+}
+
+form label {
+    color: var(--text);
+}
+
+button {
+    display: inline-block;
+    background-color: var(--accent);
+    border: solid;
+    border-color: var(--border);
+    padding: .25rem .75rem;
+    width: fit-content;
+}
+
+button:hover {
+    background-color: var(--accent-hover);
+}
+
+#prediction_form {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+    gap: 5rem;
+}
+
+#status_message {
+    padding: .5rem 1rem;
+    margin: 0;
+}
+
+.code_status {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    gap: 1rem;
+}
+
+.code_field {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#results {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.diff h2 {
+    margin:0;
+}
+
+#generated_diff {
+    min-height: 5rem;
+}
+
+#predictions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+}
+
+.V1, .V2, .V3 {
+    width: 30rem;
+}
+
+.V1 h2, .V2 h2, .V3 h2, .V1 p, .V2 p, .V3 p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.diff-line {
+  padding: 0.15rem 0.5rem;
+}
+
+.diff-added {
+  color: var(--added);
+  background-color: #163426;
+}
+
+.diff-removed {
+  color: var(--removed);
+  background-color: #351d1d;
+}
+
+/*Start of CSS for homepage*/
+.split {
+    display: flex;
+    gap: 3rem;
+}
+
+.bugfix_models {
+    border: solid;
+    border-color: var(--border);
+    padding: 1rem;
+    width: 50%;
+}
+
+.pipeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bugfix_models h2, .bugfix_models p, .bugfix_models h3{
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.labels_dataset {
+    border: solid;
+    border-color: var(--border);
+    padding: 1rem;
+}
+
+.labels_dataset h2, .labels_dataset ol, .labels_dataset p {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+}
+

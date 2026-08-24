@@ -61,7 +61,7 @@ def all_predictions(diff):
         raise ValueError('The generated diff contains no tokens.')
 
     if len(ids_from_tokens) > 1024:
-        raise ValueError('The generated diff exceeds the 1,024-token limit.')
+        raise ValueError('The generated diff exceeds the 1,024 token limit.')
     
     with torch.inference_mode():
         v2_raw_predictions = v2_model(token_tensor, padding_mask)
