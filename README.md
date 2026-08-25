@@ -10,7 +10,13 @@ The three frozen models are exposed through a FastAPI inference service and an i
 
 **[Try the live application](https://python-bugfix-classifier-api.onrender.com/)** · **[Open the API documentation](https://python-bugfix-classifier-api.onrender.com/docs)**
 
-> **Note:** The free Render service may take a short time to wake after a period of inactivity.
+> **Note:** The free Render service may take a short time (~ 3 minutes in my experience) to wake after a period of inactivity.
+
+## Application Preview
+
+| Home Page | Prediction Results |
+|---|---|
+| [![Home page](docs/images/home-page.png)](docs/images/home-page.png) | [![Prediction page](docs/images/prediction-page.png)](docs/images/prediction-page.png) |
 
 ## Results at a Glance
 
