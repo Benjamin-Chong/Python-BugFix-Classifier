@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>About | Python Bug-Fix-Classfiier</title>
+        <title>About | Python Bug-Fix Classfiier</title>
         <link rel="stylesheet" href="styles.css">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
                     <p>This is a machine-learning model and it can make mistakes. When entering your buggy and fixed code, the label may not be representative of your expected fix. Please refer to the section below.</p>
                     <h2>Selected RunBugRun Categories</h2>
                     <ol>
-                        <li>Assignement: the fix changes an assignment, such as the value being assigned, the assignment target, or the assignment operator.</li>
+                        <li>Assignment: the fix changes an assignment, such as the value being assigned, the assignment target, or the assignment operator.</li>
                         <li>Call: the fix adds, removes, or modifies a function/method call, including its arguments.</li>
                         <li>Control Flow: the fix changes how execution proceeds, such as an if condition, loop, branch, break, continue, or return.</li>
                         <li>Expression: the fix changes an expression or operation, such as arithmetic, comparison, binary, or unary operators.</li>
@@ -34,10 +34,10 @@
                 <div class="progression">
                     <h2>Progression:</h2>
                     <ol>
-                        <li>This project initially was supposed to be a PyTorch only model that performed the prediction, but evolved into a more complex project as I went along.</li>
-                        <li>I started by refining the project into two parts, V1 and V2. V1 was the classical machine learning model using scikit-learn with a TF-IDF algorithm in order create the representation for the model. V2 was originally supposed to be a transformer model.</li>
-                        <li>Following the completion of V1, I decided to make V2 a classifier with an additional dimension (embeddings) in order to make a more detailed conclusion when comparing V2 against V3</li>
-                        <li>The project finally concluded with V3, where I performed a careful analysis comparing the three models and their metrics, such as F1, confusion matrices, and accuracy</li>
+                        <li>The project began as a single PyTorch classifier but evolved into a controlled comparison of three model architectures.</li>
+                        <li>V1 established a classical baseline using TF-IDF representations with scikit-learn classifiers.</li>
+                        <li>V2 introduced learned token embeddings with masked mean pooling, creating an intermediate model between the fixed TF-IDF representation and the sequence-aware Transformer.</li>
+                        <li>V3 added positional encoding and self-attention. I then compared all three models using accuracy, macro F1, weighted F1, and class-level confusion patterns.</li>
                     </ol>
                 </div>
             </div>

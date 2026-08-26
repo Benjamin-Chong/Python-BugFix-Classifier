@@ -6,7 +6,7 @@ An end-to-end machine learning project that compares how three code representati
 - **V2:** Learned token embeddings with masked mean pooling
 - **V3:** A sequence-aware Transformer encoder with positional encoding and self-attention
 
-The three frozen models are exposed through a FastAPI inference service and an interactive HTML, CSS, and JavaScript frontend.
+The three frozen models are exposed through a FastAPI inference service and an interactive HTML, CSS, and JavaScript frontend. The user will provide buggy and fixed Python code. The application will generate line diffs and each model will classify a change. The application will predict the type of change, not whether the fix is correct.
 
 **[Try the live application](https://python-bugfix-classifier-api.onrender.com/)** · **[Open the API documentation](https://python-bugfix-classifier-api.onrender.com/docs)**
 
@@ -416,14 +416,19 @@ The V1 error-analysis and dataset-exploration notebooks are optional for trainin
 - `notebooks/v1/04_error_analysis.ipynb`
 - `notebooks/v1/05_dataset_explorations.ipynb`
 
-The V2 evaluation notebook creates the fairly retrained V1 TF-IDF vectorizer and logistic regression artifacts used in the final comparison. The final evaluation notebook compares the frozen V1, V2, and V3 models on the common test split; its results should not be used to make further model or hyperparameter changes.
+The V2 evaluation notebook creates the retrained V1 vectorizer used for the fair comparison and logistic regression artifacts used in the final comparison. The final evaluation notebook compares the frozen V1, V2, and V3 models on the common test split; its results should not be used to make further model or hyperparameter changes.
 
 ## Repository Structure
 
 ```text
 api/                 FastAPI routes and inference service
+├── inference.py
+└── main.py
 data/processed/      Compact vocabulary and label mappings used for inference
 frontend/            Home, prediction, and about pages
+├── index.html
+├── predict.html
+└── about.html
 models/              Frozen V1, V2, and V3 inference artifacts
 notebooks/
 ├── v1/              TF-IDF baseline, exploration, and error analysis

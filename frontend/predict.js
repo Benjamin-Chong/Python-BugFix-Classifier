@@ -11,10 +11,11 @@ const generated_diff = document.getElementById('generated_diff');
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    clearResults();
     try {
         const buggy_val = buggy_input.value;
         const fixed_val = fixed_input.value;
-        message.textContent ='Loading...';
+        message.textContent ='Status: Generating predictions...';
         button.disabled = true;
         const requestBody = {
             buggy_code: buggy_val,
@@ -35,7 +36,7 @@ form.addEventListener('submit', async (event) => {
 
         try {
             data = JSON.parse(responseText);
-        } catch {
+        } catch (error) {
             generated_diff.textContent = "No prediction was generated.";
             v1_result.textContent = "—";
             v2_result.textContent = "—";
@@ -52,7 +53,7 @@ form.addEventListener('submit', async (event) => {
         v2_result.textContent = data.all_predictions.v2_prediction.replaceAll("_", " ");
         v3_result.textContent = data.all_predictions.v3_prediction.replaceAll("_", " ");
         displayDiff(data.diff);
-        message.textContent = 'Status: ' + 'Prediction Generated!';
+        message.textContent = 'Status: ' + 'Prediction generated.';
     } catch (error) {
         message.textContent = 'Status: ' + error.message;
     } finally {
@@ -80,4 +81,11 @@ function displayDiff(diff) {
         diffLine.textContent = line || " ";
         generated_diff.append(diffLine, document.createTextNode("\n"));
     }
+}
+
+function clearResults() {
+    generated_diff.textContent = "No diff generated.";
+    v1_result.textContent = "No prediction yet.";
+    v2_result.textContent = "No prediction yet.";
+    v3_result.textContent = "No prediction yet.";
 }

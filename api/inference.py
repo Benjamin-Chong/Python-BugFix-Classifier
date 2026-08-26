@@ -58,7 +58,7 @@ def all_predictions(diff):
     token_tensor = torch.tensor(ids_from_tokens, dtype=torch.long, device=device).unsqueeze(0)
     padding_mask = token_tensor.eq(token_to_id['<PAD>'])
     if not ids_from_tokens:
-        raise ValueError('The generated diff contains no tokens.')
+        raise ValueError('Buggy and fixed code must contain at least one change.')
 
     if len(ids_from_tokens) > 1024:
         raise ValueError('The generated diff exceeds the 1,024 token limit.')
