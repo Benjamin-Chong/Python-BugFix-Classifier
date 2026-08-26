@@ -3,15 +3,18 @@ const buggy_input = document.getElementById('buggy_code');
 const fixed_input = document.getElementById('fixed_code');
 const message = document.getElementById('status_message');
 const button = document.getElementById('predict_button');
-const results = document.getElementById('results');
 const v1_result = document.getElementById('v1_prediction');
 const v2_result = document.getElementById('v2_prediction');
 const v3_result = document.getElementById('v3_prediction');
 const generated_diff = document.getElementById('generated_diff');
 
+buggy_input.addEventListener("input", handleInputChange);
+fixed_input.addEventListener("input", handleInputChange);
+
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
     clearResults();
+
     try {
         const buggy_val = buggy_input.value;
         const fixed_val = fixed_input.value;
@@ -36,15 +39,11 @@ form.addEventListener('submit', async (event) => {
 
         try {
             data = JSON.parse(responseText);
-        } catch (error) {
-            generated_diff.textContent = "No prediction was generated.";
-            v1_result.textContent = "—";
-            v2_result.textContent = "—";
-            v3_result.textContent = "—";
-            message.textContent = "Status: " + error.message;
-            throw new Error("The server could not process this prediction. Please try again.");
+        } catch {
+            throw new Error(
+                "The server could not process this prediction. Please try again."
+            );
         }
-
         if (!response.ok) {
             throw new Error(data.detail || 'Prediction failed.');
         }
@@ -88,4 +87,9 @@ function clearResults() {
     v1_result.textContent = "No prediction yet.";
     v2_result.textContent = "No prediction yet.";
     v3_result.textContent = "No prediction yet.";
+}
+
+function handleInputChange() {
+    clearResults();
+    message.textContent = "Status: Ready for a prediction.";
 }

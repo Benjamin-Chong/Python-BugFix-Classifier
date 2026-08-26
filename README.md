@@ -426,9 +426,11 @@ api/                 FastAPI routes and inference service
 └── main.py
 data/processed/      Compact vocabulary and label mappings used for inference
 frontend/            Home, prediction, and about pages
+├── about.html
 ├── index.html
 ├── predict.html
-└── about.html
+├── predict.js
+└── styles.css
 models/              Frozen V1, V2, and V3 inference artifacts
 notebooks/
 ├── v1/              TF-IDF baseline, exploration, and error analysis
